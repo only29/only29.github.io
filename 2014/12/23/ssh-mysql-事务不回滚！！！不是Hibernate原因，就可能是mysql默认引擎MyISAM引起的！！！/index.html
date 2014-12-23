@@ -7,13 +7,17 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public | only29</title>
+    <title>ssh mysql 事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！ | only29</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="only29">
     
-    <meta name="description" content="解决方案：
-原JDK版本：1.7.0_03 出现该异常更换JDK版本：1.8.0_20">
+    <meta name="description" content="首先声明，这个问题涉及到的数据库是MySQL。这是个很奇怪的问题，事务怎么会不回滚呢？
+实际上这是个愚蠢的问题，是经验不足导致的，越是奇怪的问题解决起来就越容易。
+ 不回滚的根本原因不在Hibernate，更不是SSH框架，而在MySQL本身。
+
+查看MySQL提供什么存储引擎：
+mysql&amp;gt;">
     
     
     
@@ -76,15 +80,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2014/12/20/java-lang-IllegalAccessException-Class-javax-el-BeanELResolver-can-not-access-a-member-of-class-org-springframework-data-domain-Chunk-with-modifiers-public/" title="java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public" itemprop="url">java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public</a>
+      <a href="/2014/12/23/ssh-mysql-事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！/" title="ssh mysql 事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！" itemprop="url">ssh mysql 事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://www.only29.im" title="only29">only29</a>
     </p>
   <p class="article-time">
-    <time datetime="2014-12-20T08:56:26.000Z" itemprop="datePublished">Dec 20 2014</time>
-    Updated:<time datetime="2014-12-23T01:31:19.000Z" itemprop="dateModified">Dec 23 2014</time>
+    <time datetime="2014-12-23T07:48:23.000Z" itemprop="datePublished">Dec 23 2014</time>
+    Updated:<time datetime="2014-12-23T08:06:47.000Z" itemprop="dateModified">Dec 23 2014</time>
     
   </p>
 </header>
@@ -96,28 +100,57 @@
 		
 		</div>
 		
-		<p>解决方案：</p>
-<p>原JDK版本：1.7.0_03 出现该异常<br>更换JDK版本：1.8.0_20</p>
+		<p><strong>首先声明，这个问题涉及到的数据库是MySQL。这是个很奇怪的问题，事务怎么会不回滚呢？</strong></p>
+<p>实际上这是个愚蠢的问题，是经验不足导致的，越是奇怪的问题解决起来就越容易。</p>
+<font color="red"> <strong>不回滚的根本原因不在Hibernate，更不是SSH框架，而在MySQL本身。</strong></font>
+
+<p>查看MySQL提供什么存储引擎：</p>
+<p><code>mysql&gt;show engines;</code></p>
+<p>或者：查看MySQL数据库使用的存储引擎：</p>
+<p>　<code>mysql&gt;show variables like &#39;%storage_engine%&#39;;</code></p>
+<p>结果：<br><img src="/images/2014/12/23/21.jpeg" alt=""> </p>
+<blockquote>
+<p>从结果上看，我本机当前数据库的默认存储引擎是MyISAM（注意观察Support这一列的值），这就是为什么不回滚的原因：<font color="red"> InnoDB支持事务，而MyISAM不支持！</font>其实MyISAM是MySQL默认的存储引擎，在安装MySQL时如果没有指定存储引擎，那么MySQL会默认使用MyISAM，因为它不支持事务，也许效率会比InnoDB高一些。</p>
+</blockquote>
+<p>如果使用的是MyISAM，那么需要将其改为InnoDB，具体方法如下：</p>
+<ul>
+<li><p><strong>1、打开“MySQL_HOME/my.ini”，找到[mysqld]，在它的下面有一句话是“skip-innodb”，将其注释掉，即改为：#skip-innodb。</strong></p>
+</li>
+<li><p><strong>2、在[mysqld]下加上一句“default_table_type=INNODB”（如果写成default-storage-engine=INNODB也可以，两者之间的区别我还没有研究过）</strong></p>
+</li>
+<li><p><strong>3、重启MySQL服务（注意：是重启服务，不是光退出数据库就完事了！）</strong></p>
+</li>
+<li><p><strong>4、再次执行mysql&gt; show engines;可以看见默认存储引擎已经变成InnoDB了。</strong></p>
+</li>
+<li><p><strong>5、原来已经存在的表，如果想使用事务，要修改它的存储引擎，在默认是InnoDB的情况下删除重建。当不想删除的时候，执行alter table 表名 ENGINE = InnoDB;之后执行show table status from 数据库名 where name=’表名’;</strong></p>
+</li>
+</ul>
+<p>可以查看表状态，看存储引擎是否被修改了。</p>
+<p>在使用了InnoDB引擎之后，再次运行代码，回滚成功！</p>
+<blockquote>
+<p>由于接手了老的项目，mysql引擎全部采用默认的MyISAM，问了架构师是为了：<font color="red"> 为了快和节省空间???,事务全在代码层面控制???</font></p>
+</blockquote>
+<p><br><br>感谢: <a href="http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments" target="_blank" rel="external">http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Exception/">Exception</a>
+  <span></span> <a href="/tags/Mysql/">Mysql</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Exception/">Exception</a>
+  <a class="article-category-link" href="/categories/Mysql/">Mysql</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://www.only29.im/2014/12/20/java-lang-IllegalAccessException-Class-javax-el-BeanELResolver-can-not-access-a-member-of-class-org-springframework-data-domain-Chunk-with-modifiers-public/" data-title="java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public | only29" data-tsina="null" class="share clearfix">
+  <div data-url="http://www.only29.im/2014/12/23/ssh-mysql-事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！/" data-title="ssh mysql 事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！ | only29" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -126,14 +159,14 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/" title="Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)</span>
+
+<div class="next">
+<a href="/2014/12/23/mysql-5-6-17-win32免安装-服务无法启动报1067/"  title="mysql-5.6.17-win32免安装 服务无法启动报1067">
+ <strong>NEXT:</strong><br/> 
+ <span>mysql-5.6.17-win32免安装 服务无法启动报1067
+</span>
 </a>
 </div>
-
 
 </nav>
 
