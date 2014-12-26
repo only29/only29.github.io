@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/22/Ubuntu%E5%AE%89%E8%A3%85Memcache/</loc>
+    <lastmod>2014-12-26T05:22:19.000Z</lastmod>
+    <data>
+        <display>
+        <title>Ubuntu安装Memcache</title>
+        <pubTime>2014-12-22T01:35:34.000Z</pubTime>
+        
+        <tag>Ubuntu </tag>
+         
+        <tag>Memcache </tag>
+         
+         <content><![CDATA[<h2 id="一、下载">一、下载</h2>
+<p>安装memcached需要先安装libevent(先到官网下载)</p>
+<p>本机安装版本：</p>
+<ul>
+<li><p>memcached：memcached-1.4.20.tar.gz</p>
+</li>
+<li><p>libevent：libevent-2.0.21-stable.tar.gz</p>
+</li>
+</ul>
+<h2 id="二、安装Libevent">二、安装Libevent</h2>
+<p>1.查看是否已安装：</p>
+<p>&emsp;<code>ls -al /usr/lib | grep libevent</code> </p>
+<p>如果版本过低，可先卸载：</p>
+<p>&emsp;<code>rpm -e - -nodeps libevent</code> </p>
+<p>2.解压libevent安装包：libevent-2.0.21-stable.tar.gz，到指定目录</p>
+<p>3.切换到解压后的 libevent 主目录：cd llibevent-2.0.21-stable</p>
+<p>4.依次执行：</p>
+<p> &emsp;    <code>./configure --program-prefix=/usr（或 ./configure –prefix=/usr ）</code><br> &emsp; <code>make</code><br> &emsp; <code>make install  (权限不够，则需要root权限：sudo make intall)</code> </p>
+<p>  注意：<br>        1）libevent会安装到 <code>/usr/lib</code>  或下 <code>/usr/local/lib</code> </p>
+<p>5.测试libevent是否安装成功：</p>
+<p>&emsp;<code>ls -al /usr/lib | grep libevent</code> （或<code>ls -al /usr/local/lib | grep libevent</code>）</p>
+<p>出现类似下图结果则表示安装成功：<br><img src="/images/2014/12/22/11.png" alt=""> </p>
+<p>6.如果libevent的安装目录为/usr/local/lib下，则还需要建立 libevent-1.4.so.2 到 /usr/lib 的软连接，这样其他程序运行时才能找到libevent库：</p>
+<p>&emsp;<code>ln -s /usr/local/lib/libevent-1.4.so.2  /usr/lib/libevent-1.4.so.2</code><br>&emsp;</p>
+<h2 id="三、安装memcached">三、安装memcached</h2>
+<p>1.解压mencached安装包：memcached-1.4.20.tar.gz，到指定目录</p>
+<p>2.切换到解压后的 mencached 主目录：cdmemcached-1.4.20</p>
+<p>3.依次执行：</p>
+<p>&emsp;<code>./configure --with-libevent=/usr (安装中指定libevent的安装位置)</code><br>&emsp;<code>make</code><br>&emsp;<code>sudo make install</code></p>
+<p>4.测试是否成功安装memcached</p>
+<p> &emsp;<code>ls -al /usr/local/bin/mem*</code></p>
+<p><img src="/images/2014/12/22/12.png" alt=""> </p>
+<h2 id="四、启动memcached服务">四、启动memcached服务</h2>
+<h4 id="1-运行_Memcached">1.运行 Memcached</h4>
+<p>目标：使用11211端口、最大占用512M内存、1024个软连接，输</p>
+<p>出客户端请求，以守护进程方式运行</p>
+<p> &emsp;<code>/usr/local/bin/memcached -p 11211 -d -u root -m 512 -c 1024 -vvv</code></p>
+<p><img src="/images/2014/12/22/13.png" alt=""> </p>
+<p><strong>关注基本选项</strong></p>
+<ul>
+<li><p>-p <num> 监听的TCP端口 (缺省: 11211)</num></p>
+</li>
+<li><p>-d 以守护进程方式运行Memcached</p>
+</li>
+<li><p>-u <username> 运行Memcached的账户，非root用户</username></p>
+</li>
+<li><p>-l 是监听的服务器IP地址，如果有多个地址的话，我这里指定了服务器的IP地址本地(默认localhost)，</p>
+</li>
+<li><p>-m <num> 最大的内存使用, 单位是MB，缺省是 64 MB</num></p>
+</li>
+<li><p>-c选项是最大运行的并发连接数，默认是1024，按照你服务器的负载量来设定，</p>
+</li>
+<li><p>-v 输出警告和错误信息</p>
+</li>
+<li><p>-vv 打印客户端的请求和返回信息</p>
+</li>
+<li><p>-h 打印帮助信息</p>
+</li>
+<li><p>-i 打印memcached和libevent的版权信息<br>&emsp;</p>
+<h4 id="2-检查Memcached是否正常启动">2.检查Memcached是否正常启动</h4>
+<p>&emsp;<code>ps auxxww | grep memcached</code></p>
+</li>
+</ul>
+<p><img src="/images/2014/12/22/14.png" alt=""> </p>
+<p>&emsp;</p>
+<h4 id="3-测试Memcached">3.测试Memcached</h4>
+<p><img src="/images/2014/12/22/15.png" alt=""> </p>
+<p><strong>退出：quit或者ctrl + ] 然后在按q就行了。</strong><br>&emsp;</p>
+<h4 id="4-Memcached常用命令">4.Memcached常用命令</h4>
+<h5 id="&emsp;4-1查看状态:status">&emsp;4.1查看状态:<code>status</code></h5>
+<p><img src="/images/2014/12/22/16.png" alt=""> </p>
+<h5 id="&emsp;4-2查看memcached进程pid">&emsp;4.2查看memcached进程pid</h5>
+<p> &emsp;<code>ps -ef|grep memcached</code></p>
+<h5 id="&emsp;4-3关闭memcached">&emsp;4.3关闭memcached</h5>
+<p> &emsp;<code>kill -9 [memcached的pid]</code><br>&emsp;<br>&emsp;<br>参考:</p>
+<blockquote>
+<p><a href="http://blog.csdn.net/feihu_guest/article/details/8446053" target="_blank" rel="external">http://blog.csdn.net/feihu_guest/article/details/8446053</a><br><a href="http://www.cnblogs.com/zgx/archive/2011/08/10/2134097.html" target="_blank" rel="external">http://www.cnblogs.com/zgx/archive/2011/08/10/2134097.html</a></p>
+</blockquote>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Ubuntu" url="http://www.only29.im/categories/Ubuntu/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/26/Ubuntu%E5%AE%89%E8%A3%85Nginx/</loc>
+    <lastmod>2014-12-26T05:20:31.000Z</lastmod>
+    <data>
+        <display>
+        <title>Ubuntu安装Nginx</title>
+        <pubTime>2014-12-26T05:06:14.000Z</pubTime>
+        
+        <tag>Ubuntu </tag>
+         
+        <tag>Nginx </tag>
+         
+         <content><![CDATA[<p>本机:</p>
+<p>nginx-1.7.7.tar.gz</p>
+<p>pcre-8.34.tar.gz</p>
+<h4 id="模块依赖性">模块依赖性</h4>
+<p>gzip 模块需要 zlib 库<br>rewrite 模块需要 pcre 库<br>ssl 功能需要 openssl 库<br>预先编译好的安装包<br><code>sudo apt-get install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev</code></p>
+<h4 id="nginx的准备工作">nginx的准备工作</h4>
+<p>下载nginx-1.7.7.tar.gz包到你指定的目录下后，解压：<br><code>tar zxvf nginx-1.7.7.tar.gz</code><br>解压后在当前目录下会生成一个nginx-1.7.7的目录<br>进入解压后的目录，运行configure命令，<br> <code>./configure</code></p>
+<p>这时会报出一个如下错误：<br>./configure: error: the HTTP rewrite module requires the PCRE library.<br>You can either disable the module by using —without-http_rewrite_module<br>option, or install the PCRE library into the system, or build the PCRE library<br>statically from the source with nginx by using —with-pcre= option.</p>
+<font color="red">这是因为没有PCRE library的原因所致，通过下面的命令安装相关的lib即可解决</font>
+
+<h4 id="PCRE库的安装：">PCRE库的安装：</h4>
+<ul>
+<li>解压：<br><code>tar –zxvf pcre-8.34.tar.gz</code><br>解压目录为：pcre-8.34<br>然后进入到 <code>cd pcre-8.34</code>，进行配置、编译、安装</li>
+<li>配置<br><code>./configure</code></li>
+<li>编译pcre<br><code>make</code></li>
+</ul>
+<blockquote>
+<p>make pcre时会出错<br><strong>libtool: compile: unrecognized option -DHAVE_CONFIG_H<br>libtool: compile: Try  libtool —help  for more information.<br>make[1]:  [pcrecpp.lo] Error 1<br>make[1]: Leaving directory /home/mfcai/pcre-8.10<br>make:  [all] Error 2</strong></p>
+<p>安装build-essential<br><code>apt-get install build-essential</code></p>
+</blockquote>
+<ul>
+<li>安装pcre<br>make install</li>
+</ul>
+<h4 id="nginx的安装">nginx的安装</h4>
+<p><code>./configure</code><br><code>make</code><br><code>make install</code></p>
+<p>Nginx会被安装在/usr/local/nginx目录下（也可以使用参数—prefix=指定自己需要的位置），<br>安装成功后 /usr/local/nginx 目录下有四个子目录分别是：conf、html、logs、sbin 。<br>其中 Nginx 的配置文件存放于 conf/nginx.conf，<br>bin文件是位于 sbin 目录下的 nginx 文件。<br>确保系统的 80 端口没被其他程序占用，运行 sbin/nginx 命令来启动 Nginx，<br>打开浏览器访问此机器的 IP，如果浏览器出现 Welcome to nginx! 则表示 Nginx 已经安装并运行成功!!!</p>
+<h4 id="常用命令">常用命令</h4>
+<p><code>cd usr/local/nginx/sbin</code> //切换到（权限不够加sudo！！！）</p>
+<p><code>./nginx</code> //启动</p>
+<p><code>./nginx -s reload</code> //重启</p>
+<p><code>./nginx -t</code> //判断配置文件是否正确</p>
+<p><code>./nginx -s stop</code> //关闭</p>
+<p>或者<br>查询nginx主进程号<br><code>ps -ef | grep nginx</code></p>
+<blockquote>
+<p>从容停止   kill -QUIT 主进程号</p>
+<p>快速停止   kill -TERM 主进程号</p>
+<p>强制停止   kill -9 nginx</p>
+</blockquote>
+<p>若nginx.conf配置了pid文件路径，如果没有，则在logs目录下</p>
+<p>kill -信号类型 ‘/usr/local/nginx/logs/nginx.pid’</p>
+<p>参考来自：<br><a href="http://blog.sina.com.cn/s/blog_4ad7c2540101duql.html" target="_blank" rel="external">http://blog.sina.com.cn/s/blog_4ad7c2540101duql.html</a><br><a href="http://www.cnblogs.com/jianxie/p/3990377.html" target="_blank" rel="external">http://www.cnblogs.com/jianxie/p/3990377.html</a></p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Ubuntu" url="http://www.only29.im/categories/Ubuntu/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/26/%E5%B0%86Eclipse%E9%A1%B9%E7%9B%AE%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2%E5%88%B0Tomcat%E7%9A%84webapps%E7%9B%AE%E5%BD%95%E4%B8%8B/</loc>
+    <lastmod>2014-12-26T05:00:14.000Z</lastmod>
+    <data>
+        <display>
+        <title>将Eclipse项目自动部署到Tomcat的webapps目录下</title>
+        <pubTime>2014-12-26T04:53:43.000Z</pubTime>
+        
+        <tag>Tomcat </tag>
+         
+         <content><![CDATA[<blockquote>
+<p>问题：<br>Eclipse javaee版本配置tomcat7.0服务器默认的发布目录是eclipse的配置目录，路径:<font color="red">【workspace】\.metadata\.plugins\org.eclipse.wst.server.core\temp*</font>要使用tomcat服务器发布目录，需要修改默认发布路径</p>
+</blockquote>
+<p>解决方案:</p>
+<ul>
+<li><p>1.先移除Tomcat下所有的web项目，Remove并Clean</p>
+</li>
+<li><p>2.打开服务器配置页面:选中服务器-&gt;F3;或者选中服务器-&gt;右键-&gt;Open，然后修改红色边框，选择自定义Tomcat的目录下:<br><img src="/images/2014/12/26/11.jpeg" alt=""> </p>
+</li>
+</ul>
+<p>参考：<br><a href="http://blog.csdn.net/ilovecodemonkey/article/details/21877513" target="_blank" rel="external">http://blog.csdn.net/ilovecodemonkey/article/details/21877513</a></p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/23/ssh-mysql-%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A%EF%BC%81%EF%BC%81%EF%BC%81%E4%B8%8D%E6%98%AFHibernate%E5%8E%9F%E5%9B%A0%EF%BC%8C%E5%B0%B1%E5%8F%AF%E8%83%BD%E6%98%AFmysql%E9%BB%98%E8%AE%A4%E5%BC%95%E6%93%8EMyISAM%E5%BC%95%E8%B5%B7%E7%9A%84%EF%BC%81%EF%BC%81%EF%BC%81/</loc>
+    <lastmod>2014-12-23T08:06:47.000Z</lastmod>
+    <data>
+        <display>
+        <title>ssh mysql 事务不回滚！！！不是Hibernate原因，就可能是mysql默认引擎MyISAM引起的！！！</title>
+        <pubTime>2014-12-23T07:48:23.000Z</pubTime>
+        
+        <tag>Mysql </tag>
+         
+         <content><![CDATA[<p><strong>首先声明，这个问题涉及到的数据库是MySQL。这是个很奇怪的问题，事务怎么会不回滚呢？</strong></p>
+<p>实际上这是个愚蠢的问题，是经验不足导致的，越是奇怪的问题解决起来就越容易。</p>
+<font color="red"> <strong>不回滚的根本原因不在Hibernate，更不是SSH框架，而在MySQL本身。</strong></font>
+
+<p>查看MySQL提供什么存储引擎：</p>
+<p><code>mysql&gt;show engines;</code></p>
+<p>或者：查看MySQL数据库使用的存储引擎：</p>
+<p>　<code>mysql&gt;show variables like &#39;%storage_engine%&#39;;</code></p>
+<p>结果：<br><img src="/images/2014/12/23/21.jpeg" alt=""> </p>
+<blockquote>
+<p>从结果上看，我本机当前数据库的默认存储引擎是MyISAM（注意观察Support这一列的值），这就是为什么不回滚的原因：<font color="red"> InnoDB支持事务，而MyISAM不支持！</font>其实MyISAM是MySQL默认的存储引擎，在安装MySQL时如果没有指定存储引擎，那么MySQL会默认使用MyISAM，因为它不支持事务，也许效率会比InnoDB高一些。</p>
+</blockquote>
+<p>如果使用的是MyISAM，那么需要将其改为InnoDB，具体方法如下：</p>
+<ul>
+<li><p><strong>1、打开“MySQL_HOME/my.ini”，找到[mysqld]，在它的下面有一句话是“skip-innodb”，将其注释掉，即改为：#skip-innodb。</strong></p>
+</li>
+<li><p><strong>2、在[mysqld]下加上一句“default_table_type=INNODB”（如果写成default-storage-engine=INNODB也可以，两者之间的区别我还没有研究过）</strong></p>
+</li>
+<li><p><strong>3、重启MySQL服务（注意：是重启服务，不是光退出数据库就完事了！）</strong></p>
+</li>
+<li><p><strong>4、再次执行mysql&gt; show engines;可以看见默认存储引擎已经变成InnoDB了。</strong></p>
+</li>
+<li><p><strong>5、原来已经存在的表，如果想使用事务，要修改它的存储引擎，在默认是InnoDB的情况下删除重建。当不想删除的时候，执行alter table 表名 ENGINE = InnoDB;之后执行show table status from 数据库名 where name=’表名’;</strong></p>
+</li>
+</ul>
+<p>可以查看表状态，看存储引擎是否被修改了。</p>
+<p>在使用了InnoDB引擎之后，再次运行代码，回滚成功！</p>
+<blockquote>
+<p>由于接手了老的项目，mysql引擎全部采用默认的MyISAM，问了架构师是为了：<font color="red"> 为了快和节省空间???,事务全在代码层面控制???</font></p>
+</blockquote>
+<p><br><br>感谢: <a href="http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments" target="_blank" rel="external">http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments</a></p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Mysql" url="http://www.only29.im/categories/Mysql/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/23/mysql-5-6-17-win32%E5%85%8D%E5%AE%89%E8%A3%85-%E6%9C%8D%E5%8A%A1%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E6%8A%A51067/</loc>
+    <lastmod>2014-12-23T06:26:39.000Z</lastmod>
+    <data>
+        <display>
+        <title>mysql-5.6.17-win32免安装 服务无法启动报1067</title>
+        <pubTime>2014-12-23T06:22:10.000Z</pubTime>
+        
+        <tag>mysql5.6 </tag>
+         
+         <content><![CDATA[<p>原先参考来自：</p>
+<p><a href="http://blog.csdn.net/navy_xue/article/details/20209491" target="_blank" rel="external">http://blog.csdn.net/navy_xue/article/details/20209491</a></p>
+<p>但是MySQL 服务无法启动 报1067错误，根据该贴解决方法：</p>
+<p><strong>删除data目录下的ib_logfile0和ib_logfile1文件，也无法解决；</strong></p>
+<p>最后找到： <a href="http://blog.csdn.net/xiiny/article/details/17334185" target="_blank" rel="external">http://blog.csdn.net/xiiny/article/details/17334185</a></p>
+<p>因为自己的粗心将my.ini的basedir和datadir路径写错：</p>
+<p><strong>basedir=E:\tool\mysql\mysql-5.6.17-win32(错误) —&gt; basedir=E:/tool/mysql/mysql-5.6.17-win32(正确)</strong></p>
+<p><img src="/images/2014/12/23/11.jpeg" alt=""> </p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Mysql" url="http://www.only29.im/categories/Mysql/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/</loc>
+    <lastmod>2014-12-23T01:31:39.000Z</lastmod>
+    <data>
+        <display>
+        <title>Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)</title>
+        <pubTime>2014-12-20T09:06:00.000Z</pubTime>
+        
+        <tag>Exception </tag>
+         
+         <content><![CDATA[<h3 id="原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><strong>原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</strong></h3>
+<p>解决方案：</p>
+<p>  <strong>- eclipse 编译器（1.7）改1.6  ： Project -&gt; Properties -&gt; Java Compiler</strong></p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Exception" url="http://www.only29.im/categories/Exception/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/20/java-lang-IllegalAccessException-Class-javax-el-BeanELResolver-can-not-access-a-member-of-class-org-springframework-data-domain-Chunk-with-modifiers-public/</loc>
+    <lastmod>2014-12-23T01:31:19.000Z</lastmod>
+    <data>
+        <display>
+        <title>java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public</title>
+        <pubTime>2014-12-20T08:56:26.000Z</pubTime>
+        
+        <tag>Exception </tag>
+         
+         <content><![CDATA[<p>解决方案：</p>
+<p>原JDK版本：1.7.0_03 出现该异常<br>更换JDK版本：1.8.0_20</p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Exception" url="http://www.only29.im/categories/Exception/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/22/Eclipse%E6%97%A0%E6%B3%95%E8%AF%86%E5%88%ABsvn%E4%BB%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A3%80%E5%87%BA%E7%9A%84%E9%A1%B9%E7%9B%AE/</loc>
+    <lastmod>2014-12-23T01:27:47.000Z</lastmod>
+    <data>
+        <display>
+        <title>Eclipse无法识别svn从服务器检出的项目</title>
+        <pubTime>2014-12-22T05:42:09.000Z</pubTime>
+        
+        <tag>SVN/GIT </tag>
+         
+         <content><![CDATA[<p>将svn从服务器检出的项目导入eclipse，eclipse无法识别和追踪文件！！！</p>
+<p>然后项目右键-》team-》Share Project，显示如下错误：</p>
+<p><img src="/images/2014/12/22/31.jpeg" alt=""> </p>
+<p>原因是：</p>
+<blockquote>
+<p><strong>服务器svn的版本是1.6.x,eclise安装的插件和本地安装的TortoiseSVN都是1.8.x的！！！版本不一致导致的！</strong></p>
+</blockquote>
+<p>解决：</p>
+<blockquote>
+<p><strong>跟服务器的统一版本！！！</strong></p>
+</blockquote>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="SVN/GIT" url="http://www.only29.im/categories/SVN-GIT/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/22/UML%E7%B1%BB%E5%9B%BE%E5%87%A0%E7%A7%8D%E5%85%B3%E7%B3%BB%E7%9A%84%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2014-12-23T01:25:50.000Z</lastmod>
+    <data>
+        <display>
+        <title>UML类图几种关系的总结</title>
+        <pubTime>2014-12-22T05:09:35.000Z</pubTime>
+        
+        <tag>UML </tag>
+         
+         <content><![CDATA[<p>在UML类图中，常见的有以下几种关系:</p>
+<ul>
+<li>泛化（Generalization）</li>
+<li>实现（Realization）</li>
+<li>关联（Association）</li>
+<li>聚合（Aggregation）</li>
+<li>组合（Composition）</li>
+<li>依赖（Dependency）</li>
+</ul>
+<h4 id="1-泛化(Generalization)">1.泛化(Generalization)</h4>
+<p>【泛化关系】：是一种继承关系,它指定了子类如何特化父类的所有特征和行为例如：老虎是动物的一种.</p>
+<p>【箭头指向】：<strong><em>带三角箭头的实线</em></strong>，箭头指向父类</p>
+<p><img src="/images/2014/12/22/21.png" alt=""> </p>
+<h4 id="2-实现（Realization)">2.实现（Realization)</h4>
+<p>【实现关系】：是一种类与接口的关系，表示类是接口所有特征和行为的实现</p>
+<p>【箭头指向】：<strong><em>带三角箭头的虚线</em></strong>，箭头指向接口</p>
+<p><img src="/images/2014/12/22/22.png" alt=""> </p>
+<h4 id="3-关联（Association）">3.关联（Association）</h4>
+<p>【关联关系】：是一种拥有的关系,它使一个类知道另一个类的属性和方法；如：老师与学生，丈夫与妻子</p>
+<p>关联可以是双向的，也可以是单向的。双向的关联可以有两个箭头或者没有箭头，单向的关联有一个箭头。</p>
+<p>【代码体现】：成员变量</p>
+<p>【箭头及指向】：<strong><em>带普通箭头的实心线</em></strong>，指向被拥有者</p>
+<p><img src="/images/2014/12/22/23.png" alt=""> </p>
+<p>上图中，老师与学生是双向关联，老师有多名学生，学生也可能有多名老师。但学生与某课程间的关系为单向关联，一名学生可能要上多门课程，课程是个抽象的东西他不拥有学生。</p>
+<p>自身关联：</p>
+<p><img src="/images/2014/12/22/24.png" alt=""> </p>
+<h4 id="4-_聚合（Aggregation）">4. 聚合（Aggregation）</h4>
+<p>【聚合关系】：是整体与部分的关系.如车和轮胎是整体和部分的关系.</p>
+<p>聚合关系是关联关系的一种，是强的关联关系；关联和聚合在语法上无法区分，必须考察具体的逻辑关系。</p>
+<p>【代码体现】：成员变量</p>
+<p>【箭头及指向】：<strong><em>带空心菱形的实心线</em></strong>，菱形指向整体</p>
+<p><img src="/images/2014/12/22/25.png" alt=""> </p>
+<h4 id="5-_组合(Composition)">5. 组合(Composition)</h4>
+<p>【组合关系】：是整体与部分的关系.,没有公司就不存在部门      组合关系是关联关系的一种，是比聚合关系还要强的关系，它要求普通的聚合关系中代表整体的对象负责代表部分的对象的生命周期</p>
+<p>【代码体现】：成员变量</p>
+<p>【箭头及指向】：<strong><em>带实心菱形的实线</em></strong>，菱形指向整体</p>
+<p><img src="/images/2014/12/22/26.png" alt=""> </p>
+<h4 id="6-_依赖(Dependency)">6. 依赖(Dependency)</h4>
+<p>【依赖关系】：是一种使用的关系,所以要尽量不使用双向的互相依赖。</p>
+<p>【代码表现】：局部变量、方法的参数或者对静态方法的调用</p>
+<p>【箭头及指向】：<strong><em>带箭头的虚线</em></strong>，指向被使用者</p>
+<p><img src="/images/2014/12/22/27.png" alt=""> </p>
+<p>各种关系的强弱顺序：</p>
+<p>泛化= 实现&gt; 组合&gt; 聚合&gt; 关联&gt; 依赖</p>
+<p>下面这张UML图，比较形象地展示了各种类图关系：</p>
+<p><img src="/images/2014/12/22/28.png" alt=""> </p>
+<p>转自: <a href="http://blog.csdn.net/tianhai110/article/details/6339565" target="_blank" rel="external">http://blog.csdn.net/tianhai110/article/details/6339565</a></p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="UML" url="http://www.only29.im/categories/UML/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+</urlset>
