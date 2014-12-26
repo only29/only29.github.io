@@ -7,12 +7,18 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError) | only29</title>
+    <title>Spring中DispacherServlet、WebApplicationContext、ServletContext的关系 | only29</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="only29">
     
-    <meta name="description" content="原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1">
+    <meta name="description" content="看《spring 技术内幕》一书会有更清晰的了解。
+
+解释一：
+  要想很好理解这三个上下文的关系，需要先熟悉spring是怎样在web容器中启动起来的。spring的启动过程其实就是其IoC容器的启动过程，对于web程序，IoC容器启动过程即是建立上下文的过程。
+spring的启动过程：
+
+首先，">
     
     
     
@@ -75,15 +81,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/" title="Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)" itemprop="url">Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)</a>
+      <a href="/2014/12/26/Spring中DispacherServlet、WebApplicationContext、ServletContext的关系/" title="Spring中DispacherServlet、WebApplicationContext、ServletContext的关系" itemprop="url">Spring中DispacherServlet、WebApplicationContext、ServletContext的关系</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://www.only29.im" title="only29">only29</a>
     </p>
   <p class="article-time">
-    <time datetime="2014-12-20T09:06:00.000Z" itemprop="datePublished">Dec 20 2014</time>
-    Updated:<time datetime="2014-12-23T01:31:39.000Z" itemprop="dateModified">Dec 23 2014</time>
+    <time datetime="2014-12-26T07:51:14.000Z" itemprop="datePublished">Dec 26 2014</time>
+    Updated:<time datetime="2014-12-26T08:09:25.000Z" itemprop="dateModified">Dec 26 2014</time>
     
   </p>
 </header>
@@ -92,32 +98,53 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><span class="toc-number">1.</span> <span class="toc-text">原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</span></a></li></ol>
+		
 		</div>
 		
-		<h3 id="原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><strong>原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</strong></h3>
-<p>解决方案：</p>
-<p>  <strong>- eclipse 编译器（1.7）改1.6  ： Project -&gt; Properties -&gt; Java Compiler</strong></p>
+		 <font color="red">看《spring 技术内幕》一书会有更清晰的了解。</font>
+
+<p>解释一：</p>
+<p>  要想很好理解这三个上下文的关系，需要先熟悉spring是怎样在web容器中启动起来的。spring的启动过程其实就是其IoC容器的启动过程，对于web程序，IoC容器启动过程即是建立上下文的过程。</p>
+<p>spring的启动过程：</p>
+<ul>
+<li><p>首先，对于一个web应用，其部署在web容器中，web容器提供其一个全局的上下文环境，这个上下文就是ServletContext，其为后面的spring IoC容器提供宿主环境；</p>
+</li>
+<li><p>其次，在web.xml中会提供有contextLoaderListener。在web容器启动时，会触发容器初始化事件，此时contextLoaderListener会监听到这个事件，其contextInitialized方法会被调用，在这个方法中，spring会初始化一个启动上下文，这个上下文被称为根上下文，即WebApplicationContext，这是一个接口类，确切的说，其实际的实现类是XmlWebApplicationContext。这个就是spring的IoC容器，其对应的Bean定义的配置由web.xml中的context-param标签指定。在这个IoC容器初始化完毕后，spring以WebApplicationContext.ROOTWEBAPPLICATIONCONTEXTATTRIBUTE为属性Key，将其存储到ServletContext中，便于获取；</p>
+</li>
+<li><p>再次，contextLoaderListener监听器初始化完毕后，开始初始化web.xml中配置的Servlet，这个servlet可以配置多个，以最常见的DispatcherServlet为例，这个servlet实际上是一个标准的前端控制器，用以转发、匹配、处理每个servlet请求。DispatcherServlet上下文在初始化的时候会建立自己的IoC上下文，用以持有spring mvc相关的bean。在建立DispatcherServlet自己的IoC上下文时，会利用WebApplicationContext.ROOTWEBAPPLICATIONCONTEXTATTRIBUTE先从ServletContext中获取之前的根上下文(即WebApplicationContext)作为自己上下文的parent上下文。有了这个parent上下文之后，再初始化自己持有的上下文。这个DispatcherServlet初始化自己上下文的工作在其initStrategies方法中可以看到，大概的工作就是初始化处理器映射、视图解析等。这个servlet自己持有的上下文默认实现类也是xmlWebApplicationContext。初始化完毕后， <font color="red">spring以与servlet的名字相关(此处不是简单的以servlet名为Key，而是通过一些转换，具体可自行查看源码)的属性为属性Key，也将其存到ServletContext中，以便后续使用。这样每个servlet就持有自己的上下文，即拥有自己独立的bean空间，同时各个servlet共享相同的bean，即根上下文(第2步中初始化的上下文)定义的那些bean。</font></p>
+</li>
+</ul>
+<p>解释二：</p>
+<p>   在Web容器（比如Tomcat）中配置Spring时，你可能已经司空见惯于web.xml文件中的以下配置代码：<br> <img src="/images/2014/12/26/21.jpg" alt=""><br>    以上配置首先会在ContextLoaderListener中通过<context-param>中的applicationContext.xml创建一个ApplicationContext，再将这个ApplicationContext塞到ServletContext里面，通过ServletContext的setAttribute方法达到此目的，在ContextLoaderListener的源代码中，我们可以看到这样的代码：<br> <img src="/images/2014/12/26/22.jpg" alt=""><br>    以上由ContextLoaderListener创建的ApplicationContext是共享于整个Web应用程序的，而你可能早已经知道，DispatcherServlet会维持一个自己的ApplicationContext，默认会读取/WEB-INFO/<dispatcherservletname>-servlet.xml文件，而我么也可以重新配置：<br> <img src="/images/2014/12/26/23.jpg" alt=""> </dispatcherservletname></context-param></p>
+<blockquote>
+<p>问题是：<strong>以上两个ApplicationContext的关系是什么，它们的作用范围分别是什么，它们的用途分别是什么？</strong></p>
+</blockquote>
+<p> ContextLoaderListener中创建ApplicationContext（根上下文）主要用于整个Web应用程序需要共享的一些组件，比如DAO，数据库的ConnectionFactory等。而由DispatcherServlet创建的ApplicationContext（根上下文的子上下文）主要用于和该Servlet相关的一些组件，比如Controller、ViewResovler等。</p>
+<p> 对于作用范围而言，在DispatcherServlet中可以引用由ContextLoaderListener所创建的ApplicationContext，而反过来不行。</p>
+<p> 在Spring的具体实现上，这两个ApplicationContext都是通过ServletContext的setAttribute方法放到ServletContext中的。但是，ContextLoaderListener（根上下文）会先于DispatcherServlet创建ApplicationContext，DispatcherServlet在创建ApplicationContext时会先找到由ContextLoaderListener所创建的ApplicationContext，再将后者的ApplicationContext（根上下文）作为参数传给DispatcherServlet的ApplicationContext的setParent()方法，在Spring源代码中，你可以在FrameServlet.java中找到如下代码：</p>
+<p> wac.setParent(parent); </p>
+<p> 其中，wac即为由DisptcherServlet创建的ApplicationContext，而parent则为有ContextLoaderListener创建的ApplicationContext。此后，框架又会调用ServletContext的setAttribute()方法将wac加入到ServletContext中。<br> <font color="red">当Spring在执行ApplicationContext的getBean时， <font color="blue">会先在父ApplicationContext中去找，再在自己context中找对应的bean（根据《Spring技术内幕》进行修改）</font>。这也解释了为什么我们可以在DispatcherServlet中获取到由ContextLoaderListener对应的ApplicationContext中的bean。</font></p>
+<p>感谢：<br><a href="http://blog.csdn.net/c289054531/article/details/9196149" target="_blank" rel="external">http://blog.csdn.net/c289054531/article/details/9196149</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Exception/">Exception</a>
+  <span></span> <a href="/tags/Spring/">Spring</a><a href="/tags/DispacherServlet/">DispacherServlet</a><a href="/tags/WebApplicationContext/">WebApplicationContext</a><a href="/tags/ServletContext/">ServletContext</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Exception/">Exception</a>
+  <a class="article-category-link" href="/categories/Spring/">Spring</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://www.only29.im/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/" data-title="Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError) | only29" data-tsina="null" class="share clearfix">
+  <div data-url="http://www.only29.im/2014/12/26/Spring中DispacherServlet、WebApplicationContext、ServletContext的关系/" data-title="Spring中DispacherServlet、WebApplicationContext、ServletContext的关系 | only29" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -127,18 +154,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2014/12/22/Ubuntu安装Memcache/" title="Ubuntu安装Memcache">
+ <a href="/2014/12/26/magent-memcached-centos-开放11212端口/" title="magent+memcached &amp;&amp; centos 开放11212端口">
   <strong>PREVIOUS:</strong><br/>
   <span>
-  Ubuntu安装Memcache</span>
+  magent+memcached &amp;&amp; centos 开放11212端口</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2014/12/20/java-lang-IllegalAccessException-Class-javax-el-BeanELResolver-can-not-access-a-member-of-class-org-springframework-data-domain-Chunk-with-modifiers-public/"  title="java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public">
+<a href="/2014/12/26/ServletContextListener获取spring注入的bean，侦听器、过滤器等不归Spring容器托管，无法用注解注入！！！/"  title="ServletContextListener获取spring注入的bean，侦听器、过滤器等不归Spring容器托管，无法用注解注入！！！">
  <strong>NEXT:</strong><br/> 
- <span>java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public
+ <span>ServletContextListener获取spring注入的bean，侦听器、过滤器等不归Spring容器托管，无法用注解注入！！！
 </span>
 </a>
 </div>
@@ -155,7 +182,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><span class="toc-number">1.</span> <span class="toc-text">原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</span></a></li></ol>
+  
   </div>
 
 <div id="asidepart">

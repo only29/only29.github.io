@@ -7,12 +7,21 @@
   <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
 <meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
   
-    <title>Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError) | only29</title>
+    <title>magent+memcached &amp;&amp; centos 开放11212端口 | only29</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="only29">
     
-    <meta name="description" content="原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1">
+    <meta name="description" content="安装magent及遇到的问题解决大全
+http://www.tuicool.com/topics/11090006
+
+
+
+magent+memcached分布式部署：(感谢作者)
+http://tim-fly.iteye.com/blog/1764519
+
+
+根据以上的思路并利用现有的设备自己部署了">
     
     
     
@@ -75,15 +84,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/" title="Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)" itemprop="url">Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError)</a>
+      <a href="/2014/12/26/magent-memcached-centos-开放11212端口/" title="magent+memcached &amp;&amp; centos 开放11212端口" itemprop="url">magent+memcached &amp;&amp; centos 开放11212端口</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://www.only29.im" title="only29">only29</a>
     </p>
   <p class="article-time">
-    <time datetime="2014-12-20T09:06:00.000Z" itemprop="datePublished">Dec 20 2014</time>
-    Updated:<time datetime="2014-12-23T01:31:39.000Z" itemprop="dateModified">Dec 23 2014</time>
+    <time datetime="2014-12-26T08:12:54.000Z" itemprop="datePublished">Dec 26 2014</time>
+    Updated:<time datetime="2014-12-26T08:29:53.000Z" itemprop="dateModified">Dec 26 2014</time>
     
   </p>
 </header>
@@ -92,32 +101,71 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><span class="toc-number">1.</span> <span class="toc-text">原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</span></a></li></ol>
+		
 		</div>
 		
-		<h3 id="原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><strong>原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</strong></h3>
-<p>解决方案：</p>
-<p>  <strong>- eclipse 编译器（1.7）改1.6  ： Project -&gt; Properties -&gt; Java Compiler</strong></p>
+		<ul>
+<li><p><strong>安装magent及遇到的问题解决大全</strong></p>
+<p><a href="http://www.tuicool.com/topics/11090006" target="_blank" rel="external">http://www.tuicool.com/topics/11090006</a></p>
+</li>
+</ul>
+<ul>
+<li><p><strong>magent+memcached分布式部署</strong>：(感谢作者)</p>
+<p><a href="http://tim-fly.iteye.com/blog/1764519" target="_blank" rel="external">http://tim-fly.iteye.com/blog/1764519</a></p>
+</li>
+</ul>
+<p>根据以上的思路并利用现有的设备自己部署了一下：</p>
+<p><img src="/images/2014/12/26/31.png" alt=""></p>
+<ul>
+<li><strong>测试过程中，在172.16.3.144机子</strong>：</li>
+</ul>
+<p>telnet 172.16.3.147 11212 出现拒绝连接，原因：172.16.3.147未开放11212端口，由于linux基础知识不扎实，记录一下！</p>
+<ul>
+<li><p><strong>Linux中iptables设置详细</strong></p>
+<p><a href="http://jsczxy2.iteye.com/blog/1436713" target="_blank" rel="external">http://jsczxy2.iteye.com/blog/1436713</a></p>
+</li>
+</ul>
+<ul>
+<li>Cenos端口命令：</li>
+</ul>
+<p>列出所有端口</p>
+<p>netstat -ntlp</p>
+<p>1、开启端口（以11212端口为例）</p>
+<p> 方法一：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/sbin/iptables -<span class="type">I</span> <span class="type">INPUT</span> -p tcp --dport <span class="number">11212</span> -j <span class="type">ACCEPT</span>  <span class="comment">//写入修改</span></div><div class="line"> </div><div class="line">/etc/<span class="keyword">init</span>.d/iptables save   <span class="comment">//保存修改</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+
+<p>方法二：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables   <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line">加入如下语句:</div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j ACCEPT   <span class="comment">// 修改完成</span></div><div class="line"></div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+
+<p>2、关闭端口</p>
+<p> 方法一：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/sbin/iptables -I INPUT -p tcp --dport <span class="number">11212</span> -j DROP   <span class="comment">//写入修改</span></div><div class="line"> </div><div class="line">/etc/init.d/iptables save   保存修改</div><div class="line"> </div><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">iptables</span> restart   重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+
+<p>方法二：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables  <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line">加入如下语句:</div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j DROP   <span class="comment">//修改完成</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+
+<p>3、查看端口状态</p>
+<p>/etc/init.d/iptables status</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Exception/">Exception</a>
+  <span></span> <a href="/tags/CenOS/">CenOS</a><a href="/tags/Magent/">Magent</a><a href="/tags/Memcache/">Memcache</a><a href="/tags/iptables/">iptables</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/Exception/">Exception</a>
+  <a class="article-category-link" href="/categories/CentOS/">CentOS</a>
 </div>
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://www.only29.im/2014/12/20/Unsupported-major-minor-version-51-0-of-class-java-lang-UnsupportedClassVersionError/" data-title="Unsupported major.minor version 51.0 (of class java.lang.UnsupportedClassVersionError) | only29" data-tsina="null" class="share clearfix">
+  <div data-url="http://www.only29.im/2014/12/26/magent-memcached-centos-开放11212端口/" data-title="magent+memcached &amp;&amp; centos 开放11212端口 | only29" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -126,19 +174,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2014/12/22/Ubuntu安装Memcache/" title="Ubuntu安装Memcache">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Ubuntu安装Memcache</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2014/12/20/java-lang-IllegalAccessException-Class-javax-el-BeanELResolver-can-not-access-a-member-of-class-org-springframework-data-domain-Chunk-with-modifiers-public/"  title="java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public">
+<a href="/2014/12/26/Spring中DispacherServlet、WebApplicationContext、ServletContext的关系/"  title="Spring中DispacherServlet、WebApplicationContext、ServletContext的关系">
  <strong>NEXT:</strong><br/> 
- <span>java.lang.IllegalAccessException: Class javax.el.BeanELResolver can not access a member of class org.springframework.data.domain.Chunk with modifiers public
+ <span>Spring中DispacherServlet、WebApplicationContext、ServletContext的关系
 </span>
 </a>
 </div>
@@ -155,7 +195,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#原因：java-lang-UnsupportedClassVersionError_happens_because_of_a_higher_JDK_during_compile_time_and_lower_JDK_during_runtime-(本机eclipse_jdk_1-6_and_编译器1-7_不一致-)"><span class="toc-number">1.</span> <span class="toc-text">原因：java.lang.UnsupportedClassVersionError happens because of a higher JDK during compile time and lower JDK during runtime.(本机eclipse jdk 1.6 and 编译器1.7 不一致.)</span></a></li></ol>
+  
   </div>
 
 <div id="asidepart">
