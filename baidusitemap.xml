@@ -4,7 +4,7 @@
     
   <url>
     <loc>http://www.only29.im/2014/12/26/magent-memcached-centos-%E5%BC%80%E6%94%BE11212%E7%AB%AF%E5%8F%A3/</loc>
-    <lastmod>2014-12-26T08:29:53.000Z</lastmod>
+    <lastmod>2014-12-26T08:33:40.000Z</lastmod>
     <data>
         <display>
         <title>magent+memcached && centos 开放11212端口</title>
@@ -49,17 +49,18 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/sbin/iptables -<span class="type">I</span> <span class="type">INPUT</span> -p tcp --dport <span class="number">11212</span> -j <span class="type">ACCEPT</span>  <span class="comment">//写入修改</span></div><div class="line"> </div><div class="line">/etc/<span class="keyword">init</span>.d/iptables save   <span class="comment">//保存修改</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
 
 <p>方法二：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables   <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line">加入如下语句:</div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j ACCEPT   <span class="comment">// 修改完成</span></div><div class="line"></div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables   <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line"><span class="comment">//加入如下语句:</span></div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j ACCEPT   <span class="comment">// 修改完成</span></div><div class="line"></div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
 
 <p>2、关闭端口</p>
 <p> 方法一：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/sbin/iptables -I INPUT -p tcp --dport <span class="number">11212</span> -j DROP   <span class="comment">//写入修改</span></div><div class="line"> </div><div class="line">/etc/init.d/iptables save   保存修改</div><div class="line"> </div><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">iptables</span> restart   重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/sbin/iptables -<span class="type">I</span> <span class="type">INPUT</span> -p tcp --dport <span class="number">11212</span> -j <span class="type">DROP</span>   <span class="comment">//写入修改</span></div><div class="line"> </div><div class="line">/etc/<span class="keyword">init</span>.d/iptables save   <span class="comment">//保存修改</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
 
 <p>方法二：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables  <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line">加入如下语句:</div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j DROP   <span class="comment">//修改完成</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/iptables  <span class="comment">//打开配置文件</span></div><div class="line"></div><div class="line"><span class="comment">//加入如下语句:</span></div><div class="line">-A INPUT -p tcp -m state --state <span class="keyword">NEW</span> -m tcp --dport <span class="number">11212</span> -j DROP   <span class="comment">//修改完成</span></div><div class="line"> </div><div class="line">service iptables restart    <span class="comment">//重启防火墙，修改生效</span></div></pre></td></tr></table></figure>
 
 <p>3、查看端口状态</p>
-<p>/etc/init.d/iptables status</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/etc/<span class="keyword">init</span>.d/iptables status</div></pre></td></tr></table></figure>
+
 ]]></content>
          
          
