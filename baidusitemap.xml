@@ -3,6 +3,82 @@
 
     
   <url>
+    <loc>http://www.only29.im/2014/12/27/Ubuntu-14-04-mysql5-6-19%EF%BC%9ASlave-IO-Running-Connecting-Last-IO-Errno-2003-%E5%8E%9F%E5%9B%A0%E6%8E%92%E6%9F%A5/</loc>
+    <lastmod>2014-12-27T02:46:40.000Z</lastmod>
+    <data>
+        <display>
+        <title>Slave_IO_Running: Connecting、 Last_IO_Errno: 2003 </title>
+        <pubTime>2014-12-27T02:08:55.000Z</pubTime>
+        
+        <tag>Mysql </tag>
+         
+         <content><![CDATA[<blockquote>
+<p>环境：<br>Ubuntu14.04, Mysql5.6.19<br>master：192.168.10.128<br>slave：192.168.10.129</p>
+</blockquote>
+<p>在搭建mysql5.6主从复制过程中，<code>show slave status\G;</code>显示以下问题：<br><img src="/images/2014/12/27/11.png" alt=""><br>日记报以下错误：</p>
+<p><img src="/images/2014/12/27/12.png" alt=""><br><strong>说明是slave连不上master</strong>，网上搜索了以下，大部分都是说以下原因：</p>
+<ul>
+<li>网络不通<br>ping 192.168.10.128 是通的！</li>
+<li>密码不对<br>正确</li>
+<li><p>pos不对<br>正确</p>
+</li>
+<li><p>防火墙没有关闭</p>
+</li>
+</ul>
+<p>a.将master、slave防火墙关闭：</p>
+<p><code>sudo ufw disable,并重启！</code></p>
+<p>b.关闭selinux，ubuntu默认是Disabled</p>
+<p>查看其状态：</p>
+<p> <code>sudo apt-get install selinux-utils</code></p>
+<p><code>getenforce</code></p>
+<p>然后再在192.168.10.129的mysql：show slave status\G;还是存在该问题;</p>
+<p>经过一番折腾发现：由于mysql是直接<code>apt-get install mysql-server-5.6</code>，发现<code>sudo vim /etc/mysql/my.cnf</code>下绑定了本机ip地址：<br><img src="/images/2014/12/27/13.jpeg" alt=""> </p>
+<p>修改master下mysql的my.cnf，将其注释！</p>
+<p>并重启mysql服务：<code>sudo /etc/init.d/mysql restart</code></p>
+<p>再次查看从mysql：<br><img src="/images/2014/12/27/14.png" alt=""> </p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Mysql" url="http://www.only29.im/categories/Mysql/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.only29.im/2014/12/23/mysql-5-6-17-win32%E5%85%8D%E5%AE%89%E8%A3%85-%E6%9C%8D%E5%8A%A1%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E6%8A%A51067/</loc>
+    <lastmod>2014-12-27T02:30:26.000Z</lastmod>
+    <data>
+        <display>
+        <title>mysql-5.6.17-win32免安装 服务无法启动报1067</title>
+        <pubTime>2014-12-23T06:22:10.000Z</pubTime>
+        
+        <tag>Mysql </tag>
+         
+         <content><![CDATA[<p>原先参考来自：</p>
+<p><a href="http://blog.csdn.net/navy_xue/article/details/20209491" target="_blank" rel="external">http://blog.csdn.net/navy_xue/article/details/20209491</a></p>
+<p>但是MySQL 服务无法启动 报1067错误，根据该贴解决方法：</p>
+<p><strong>删除data目录下的ib_logfile0和ib_logfile1文件，也无法解决；</strong></p>
+<p>最后找到： <a href="http://blog.csdn.net/xiiny/article/details/17334185" target="_blank" rel="external">http://blog.csdn.net/xiiny/article/details/17334185</a></p>
+<p>因为自己的粗心将my.ini的basedir和datadir路径写错：</p>
+<p><strong>basedir=E:\tool\mysql\mysql-5.6.17-win32(错误) —&gt; basedir=E:/tool/mysql/mysql-5.6.17-win32(正确)</strong></p>
+<p><img src="/images/2014/12/23/11.jpeg" alt=""> </p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Mysql" url="http://www.only29.im/categories/Mysql/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://www.only29.im/2014/12/26/magent-memcached-centos-%E5%BC%80%E6%94%BE11212%E7%AB%AF%E5%8F%A3/</loc>
     <lastmod>2014-12-26T08:52:46.000Z</lastmod>
     <data>
@@ -391,36 +467,6 @@
 <p>由于接手了老的项目，mysql引擎全部采用默认的MyISAM，问了架构师是为了：<font color="red"> 为了快和节省空间???,事务全在代码层面控制???</font></p>
 </blockquote>
 <p><br><br>感谢: <a href="http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments" target="_blank" rel="external">http://blog.csdn.net/zhangdaiscott/article/details/8203807#comments</a></p>
-]]></content>
-         
-         
-           
-             
-              <breadCrumb title="Mysql" url="http://www.only29.im/categories/Mysql/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://www.only29.im/2014/12/23/mysql-5-6-17-win32%E5%85%8D%E5%AE%89%E8%A3%85-%E6%9C%8D%E5%8A%A1%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E6%8A%A51067/</loc>
-    <lastmod>2014-12-23T06:26:39.000Z</lastmod>
-    <data>
-        <display>
-        <title>mysql-5.6.17-win32免安装 服务无法启动报1067</title>
-        <pubTime>2014-12-23T06:22:10.000Z</pubTime>
-        
-        <tag>mysql5.6 </tag>
-         
-         <content><![CDATA[<p>原先参考来自：</p>
-<p><a href="http://blog.csdn.net/navy_xue/article/details/20209491" target="_blank" rel="external">http://blog.csdn.net/navy_xue/article/details/20209491</a></p>
-<p>但是MySQL 服务无法启动 报1067错误，根据该贴解决方法：</p>
-<p><strong>删除data目录下的ib_logfile0和ib_logfile1文件，也无法解决；</strong></p>
-<p>最后找到： <a href="http://blog.csdn.net/xiiny/article/details/17334185" target="_blank" rel="external">http://blog.csdn.net/xiiny/article/details/17334185</a></p>
-<p>因为自己的粗心将my.ini的basedir和datadir路径写错：</p>
-<p><strong>basedir=E:\tool\mysql\mysql-5.6.17-win32(错误) —&gt; basedir=E:/tool/mysql/mysql-5.6.17-win32(正确)</strong></p>
-<p><img src="/images/2014/12/23/11.jpeg" alt=""> </p>
 ]]></content>
          
          
